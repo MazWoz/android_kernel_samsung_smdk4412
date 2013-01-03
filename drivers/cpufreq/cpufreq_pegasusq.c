@@ -1623,6 +1623,24 @@ static void dbs_check_cpu(struct cpu_dbs_info_s *this_dbs_info)
 		return;
 #endif
 
+#ifdef CONFIG_CPU_FEQ_GOV_ONDEMAND_FLEXRATE
+	/*dON'T SCALE DOWN WHILE INSIDE OF A FLEXRATE SUB-SAMPLE*/
+	if(hp_s_delay > 0 && hp_s_delay != hp_s_delayc)
+		return;
+	else {
+		/*RECALCULATE MAX_LOAD_FREQ BASED ON AVG HISTORIC OF PREV NORMALIZED SAMPLES INSTEAD OF CURRENT SAMPLE*/
+		max_load_freq = policy->min;
+
+		for_each_cpu(j, policy->cpus) {
+			unsigned int load_freq;
+			load_freq = hotplug_history->usage[num_hist].load[j] * hotplug_history->usage[num_hist].freq;
+
+			if (load_freq > max_load_freq)
+				max_load_freq = load_freq;
+		}
+	}
+#endif
+
 	/*
 	 * The optimal frequency is the frequency that is the lowest that
 	 * can support the current CPU usage without triggering the up
