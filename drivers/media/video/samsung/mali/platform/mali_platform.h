@@ -88,6 +88,7 @@ void mali_gpu_utilization_handler(u32 utilization);
  */
 //void set_mali_parent_power_domain(void* dev);
 void mali_utilization_suspend(void);
+extern int mali_gpu_utilization_timeout;
 
 #ifdef CONFIG_REGULATOR
 int mali_regulator_get_usecount(void);

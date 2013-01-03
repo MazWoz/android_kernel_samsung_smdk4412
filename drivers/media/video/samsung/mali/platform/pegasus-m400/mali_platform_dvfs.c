@@ -239,7 +239,6 @@ static mali_bool mali_dvfs_status(u32 utilization)
 	unsigned int target_freq;
 	int i;
 
-	mali_bool boostup = MALI_FALSE;
 	struct mali_policy_config mp;
 
 	level = 0; // Step delta
@@ -498,6 +497,33 @@ static ssize_t thresholds_store(struct sysdev_class * cls, struct sysdev_class_a
 	}
 	return count;	
 }
+
+static ssize_t utilization_timeout_show(struct sysdev_class * cls, 
+           struct sysdev_class_attribute *attr, char *buf)
+{
+  return sprintf(buf, "%d", mali_gpu_utilization_timeout);
+}
+
+static ssize_t utilization_timeout_store(struct sysdev_class * cls, struct sysdev_class_attribute *attr,
+            const char *buf, size_t count) 
+{
+  unsigned int ret = -EINVAL;
+  int ms;
+
+  ret = sscanf(buf, "%d", &ms);
+  if (ret != 1) {
+    return -EINVAL;
+  } else {
+    if(ms < 25)
+      ms = 25;
+    if(ms > 2000)
+      ms = 2000;
+
+    mali_gpu_utilization_timeout = ms;
+  }
+  return count;  
+}
+
 
 static ssize_t current_freq_show(struct sysdev_class * cls, 
 			     struct sysdev_class_attribute *attr, char *buf)
