@@ -1030,8 +1030,9 @@ static ssize_t store_flexrate_forcerate(struct kobject *a, struct attribute *b,
 
 	ret = sscanf(buf, "%u", &rate);
 	if (ret != 1)
+	{
 		return -EINVAL;
-
+	}
 	forced_rate = rate;
 
 	pr_info("CAUTION: flexrate_forcerate is for debugging/benchmarking only.\n");
