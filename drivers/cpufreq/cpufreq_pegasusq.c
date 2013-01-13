@@ -1754,37 +1754,44 @@ int cpufreq_ondemand_flexrate_request(unsigned int rate_us, unsigned int duratio
 	unsigned int sample_overflow = 0;
 	bool now = 0;
 
-#ifdef CONFIG_CPU_FREQ_LCD_FREQ_DFS
+	#ifdef CONFIG_CPU_FREQ_LCD_FREQ_DFS
 	/* hijack flexrate request as a touch lcdfreq boost */
 	if(dbs_tuners_ins.lcdfreq_enable) {
 		_lcdfreq_lock(0);
 		dbs_tuners_ins.lcdfreq_kick_in_down_left =
 				  dbs_tuners_ins.lcdfreq_kick_in_down_delay;
 	}
-#endif
+	#endif
 
 	if (!flexrate_enabled)
+	{
 		return 0;
-
+	}
 	if (forced_rate)
+	{
 		rate_us = forced_rate;
-
+	}
 	if (rate_us >= dbs_tuners_ins.sampling_rate)
+	{
 		return 0;
-
+	}
 	if (policy->cur >= dbs_tuners_ins.flex_max_freq)
+	{
 		return 0;
-
+	}
 	mutex_lock(&flex_mutex);
 	if (rate_us >= dbs_tuners_ins.flex_sampling_rate &&
-	    duration <= dbs_tuners_ins.flex_duration)
-		goto out;
-
+	{
+	    	duration <= dbs_tuners_ins.flex_duration)
+	    	goto out;
+	}
 	duration = min(max_duration, duration);
 	if (rate_us > 0 && rate_us < min_sampling_rate)
+	{
 		rate_us = min_sampling_rate;
-
+	}
 	if (rate_us == 0 || duration == 0) {
+	{
 		dbs_info->flex_duration = 0;
 		goto out;
 	}
@@ -1794,15 +1801,20 @@ int cpufreq_ondemand_flexrate_request(unsigned int rate_us, unsigned int duratio
 
 	dbs_info->flex_duration = dbs_tuners_ins.flex_duration;
 
-	if(dbs_info->flex_duration){
+	if(dbs_info->flex_duration)
+	{
 		sample_overflow = dbs_info->flex_hotplug_sample_delay;
 		dbs_info->flex_hotplug_sample_delay_count =
 			dbs_tuners_ins.sampling_rate / dbs_tuners_ins.flex_sampling_rate;
 		dbs_info->flex_hotplug_sample_delay = 
 			dbs_info->flex_hotplug_sample_delay_count - sample_overflow;
 		if(dbs_info->flex_hotplug_sample_delay < 0)
+		{
 			     dbs_info->flex_hotplug_sample_delay = 0;
-	} else {
+		}
+	} 
+	else 
+	{
 		dbs_info->flex_hotplug_sample_delay_count = 0;
 		dbs_info->flex_hotplug_sample_delay = 0;
 	}
@@ -1816,9 +1828,9 @@ int cpufreq_ondemand_flexrate_request(unsigned int rate_us, unsigned int duratio
 	schedule_delayed_work_on(cpu, &dbs_info->work, 1);
 
 	mutex_unlock(&dbs_info->timer_mutex);
-
-	return 0;
-out:
+	//Commented out to fix compiling issue
+	//return 0;
+	out:
 	mutex_unlock(&flex_mutex);
 
 	return 0;
